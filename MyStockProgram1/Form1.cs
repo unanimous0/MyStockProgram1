@@ -16,28 +16,31 @@ namespace MyStockProgram1
         {
             InitializeComponent();
 
-            // Click은 이벤트 속성 (에 +=로 이벤트 메소드 추가)
+            // Click은 이벤트 속성 (에 +=로 이벤트 메서드 추가)
             loginButton.Click += LoginButton_Click;
 
             codeListButton.Click += CodeListButton_Click;
 
             requestButton.Click += RequestButton_Click;
 
+            trRequestButton.Click += Button_Click;
+
             // 로그인 시도에 대한 이벤트 속성
             axKHOpenAPI1.OnEventConnect += API_OnEventConnect;
 
             // 서버로부터 (요청했던) TR데이터를 전달받았을 때
+            // OnReceiveTrData의 Delegate 속성과 동일한 속성을 갖는 메서드를 이벤트 함수로 등록해야함 (반환 타입 & 파라미터 타입 등)
             axKHOpenAPI1.OnReceiveTrData += API_OnReceiveTrData;
         }
 
-        // 로그인 버튼 클릭시 발생하는 이벤트 메소드
-        private void LoginButton_Click(object sender, EventArgs e)   // 이벤트 메소드는 두 가지 파라미터가 필요함
+        // 로그인 버튼 클릭시 발생하는 이벤트 메서드
+        private void LoginButton_Click(object sender, EventArgs e)   // 이벤트 메서드는 두 가지 파라미터가 필요함
         {
             Console.WriteLine("버튼이 눌렸습니다.");
             axKHOpenAPI1.CommConnect();     // 로그인창 띄우는 명령어
         }
 
-        // 로그인 시도시 발생하는 이벤트 메소드
+        // 로그인 시도시 발생하는 이벤트 메서드
         private void API_OnEventConnect(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnEventConnectEvent e)
         {
             Console.WriteLine("사용자가 로그인을 시도했습니다.");
@@ -87,7 +90,7 @@ namespace MyStockProgram1
             }
         }
 
-        // 종목 코드 버튼 클릭시 발생하는 이벤트 메소드
+        // 종목 코드 버튼 클릭시 발생하는 이벤트 메서드
         private void CodeListButton_Click(object sender, EventArgs e)
         {
             /*
@@ -126,6 +129,33 @@ namespace MyStockProgram1
             axKHOpenAPI1.CommRqData("주식정보요청", "opt10001", 0, "1000");
         }
 
+        // 버튼 클릭 이벤트 함수는 Button_Click 하나로 만들고, sender가 누구냐로 상황에 맞는 메서드 호출
+        private void Button_Click(object sender, EventArgs e)
+        {
+            if (sender.Equals(trRequestButton))
+            {
+                Console.WriteLine("trRequestButton이 클릭됨");
+                string code = codeTextBox.Text;
+
+                axKHOpenAPI1.SetInputValue("종목코드", code);
+                int result = axKHOpenAPI1.CommRqData("종목기본정보요청", "opt10001", 0, "1001");
+
+                if(result == 0)
+                {
+                    // 종목기본정보요청TR 요청 성공
+                    Console.WriteLine("종목조회요청 성공");
+                }
+                else
+                {
+                    // 요청 실패
+                    Console.WriteLine("종목조회요청 실패");
+                }
+            }
+        }
+
+        // #2 58:15
+        // 서버로 요청을 보내고, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e가 요청시 입력한 조건 데이터를 받아 axKHOpenAPI1.OnReceiveTrData 이벤트가 발생했을 때 호출되는 이벤트 함수
+        // AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e가 받은 "요청시 입력 조건 데이터"를 바탕으로 원하는 데이터(현재가, 거래량 등)을 axKHOpenAPI1.GetCommData를 통해 받아옴 
         private void API_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             if (e.sRQName.Equals("주식정보요청"))
@@ -138,6 +168,23 @@ namespace MyStockProgram1
                 Console.WriteLine("거래량 = {0}", volume);
                 Console.WriteLine("등락률 = {0}", rangeRate);
             }
+            else if (e.sRQName.Equals("종목기본정보요청"))
+            {
+                Console.WriteLine("e.sTrCode {0}", e.sTrCode);          // TR이름 ("opt10001")
+                Console.WriteLine("e.sRQName {0}", e.sRQName);          // 사용자 구분명 ("종목기본정보요청")
+                Console.WriteLine("e.sScrNo {0}", e.sScrNo);            // 화면번호 ("1001")
+                //Console.WriteLine("e.sRecordName {0}", e.sRecordName);  // 레코드 이름
+                Console.WriteLine("e.sPrevNext {0}", e.sPrevNext);      // 연속조회 유무를 판단하는 값 0: 연속(주가조회) 데이터 없음, 1: 연속(주가조회) 데이터 있음
+
+                string price = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "현재가");
+                string volume = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "거래량");
+                string rangeRate = axKHOpenAPI1.GetCommData(e.sTrCode, e.sRQName, 0, "등락율");
+
+                Console.WriteLine("현재가 = {0}", price);
+                Console.WriteLine("거래량 = {0}", volume);
+                Console.WriteLine("등락률 = {0}", rangeRate);
+            }
         }
+
     }
 }

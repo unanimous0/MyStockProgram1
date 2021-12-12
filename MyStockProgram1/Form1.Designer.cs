@@ -35,6 +35,8 @@ namespace MyStockProgram1
             this.codeListButton = new System.Windows.Forms.Button();
             this.textBox = new System.Windows.Forms.TextBox();
             this.requestButton = new System.Windows.Forms.Button();
+            this.trRequestButton = new System.Windows.Forms.Button();
+            this.codeTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -81,11 +83,29 @@ namespace MyStockProgram1
             this.requestButton.Text = "종목정보요청";
             this.requestButton.UseVisualStyleBackColor = true;
             // 
+            // trRequestButton
+            // 
+            this.trRequestButton.Location = new System.Drawing.Point(183, 313);
+            this.trRequestButton.Name = "trRequestButton";
+            this.trRequestButton.Size = new System.Drawing.Size(177, 28);
+            this.trRequestButton.TabIndex = 5;
+            this.trRequestButton.Text = "TR요청";
+            this.trRequestButton.UseVisualStyleBackColor = true;
+            // 
+            // codeTextBox
+            // 
+            this.codeTextBox.Location = new System.Drawing.Point(22, 313);
+            this.codeTextBox.Name = "codeTextBox";
+            this.codeTextBox.Size = new System.Drawing.Size(117, 28);
+            this.codeTextBox.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.codeTextBox);
+            this.Controls.Add(this.trRequestButton);
             this.Controls.Add(this.requestButton);
             this.Controls.Add(this.textBox);
             this.Controls.Add(this.codeListButton);
@@ -106,6 +126,8 @@ namespace MyStockProgram1
         private System.Windows.Forms.Button codeListButton;
         private System.Windows.Forms.TextBox textBox;
         private System.Windows.Forms.Button requestButton;
+        private System.Windows.Forms.Button trRequestButton;
+        private System.Windows.Forms.TextBox codeTextBox;
     }
 }
 
